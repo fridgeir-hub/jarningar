@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Járningarskrá</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0e0c; --surface: #1a1815; --surface2: #252320; --border: #3a3530;
+    --accent: #c8922a; --accent2: #e8b060; --text: #f0ebe4; --muted: #8a8078; --danger: #d04040;
+    --bottom-nav-h: 64px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Sans', sans-serif; min-height: 100vh; }
+
+  /* ── HEADER ── */
+  header { background: var(--surface); border-bottom: 2px solid var(--accent); padding: 0.8rem 1.2rem; display: flex; align-items: center; justify-content: space-between; }
+  header h1 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--accent2); }
+  .header-actions { display: flex; gap: 0.5rem; align-items: center; }
+  .icon-btn { background: none; border: 1px solid var(--border); color: var(--muted); padding: 0.4rem 0.7rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-family: 'IBM Plex Mono', monospace; transition: all 0.2s; white-space: nowrap; }
+  .icon-btn:hover { border-color: var(--accent); color: var(--accent2); }
+
+  /* ── DESKTOP NAV (top) ── */
+  #desknav { display: flex; background: var(--surface2); border-bottom: 1px solid var(--border); overflow-x: auto; }
+  #desknav button { background: none; border: none; color: var(--muted); padding: 0.75rem 1.25rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; transition: all 0.2s; }
+  #desknav button.active { color: var(--accent2); border-bottom-color: var(--accent); }
+  #desknav button:hover:not(.active) { color: var(--text); }
+
+  /* ── MOBILE NAV (bottom) ── */
+  #mobnav { display: none; position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-nav-h); background: var(--surface); border-top: 2px solid var(--accent); z-index: 50; }
+  #mobnav .mob-tabs { display: flex; height: 100%; }
+  #mobnav button { flex: 1; background: none; border: none; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; letter-spacing: 0.03em; text-transform: uppercase; transition: all 0.2s; border-top: 3px solid transparent; padding: 0; }
+  #mobnav button .nav-icon { font-size: 1.25rem; line-height: 1; }
+  #mobnav button.active { color: var(--accent2); border-top-color: var(--accent); }
+  #mobnav button:hover:not(.active) { color: var(--text); }
+
+  /* ── PAGES ── */
+  .page { display: none; padding: 1.2rem; max-width: 900px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  /* ── CARDS ── */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1.25rem; margin-bottom: 1rem; }
+  .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+  .card-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--accent2); }
+  .ph-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--accent2); }
+
+  /* ── GRID ── */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media(max-width:600px){ .grid2 { grid-template-columns: 1fr; } }
+  .grid3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.75rem; }
+  @media(max-width:500px){ .grid3 { grid-template-columns: 1fr; } }
+
+  /* ── FORMS ── */
+  label { display: block; font-size: 0.78rem; color: var(--muted); font-family: 'IBM Plex Mono', monospace; margin-bottom: 0.3rem; margin-top: 0.75rem; letter-spacing: 0.05em; text-transform: uppercase; }
+  input, select, textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 0.6rem 0.8rem; border-radius: 4px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  select option { background: var(--bg); }
+
+  /* ── BUTTONS ── */
+  .btn { background: var(--accent); color: var(--bg); border: none; padding: 0.6rem 1.25rem; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem; font-weight: 500; cursor: pointer; transition: background 0.2s; }
+  .btn:hover { background: var(--accent2); }
+  .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.75rem; }
+  .btn-outline { background: none; border: 1px solid var(--accent); color: var(--accent); }
+  .btn-outline:hover { background: var(--accent); color: var(--bg); }
+  .btn-row { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
+  .ab { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 0.85rem; padding: 0.2rem 0.4rem; border-radius: 3px; transition: color 0.2s; }
+  .ab:hover { color: var(--accent2); }
+  .ab.del:hover { color: var(--danger); }
+
+  /* ── TAGS / BADGES ── */
+  .tag { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 3px; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; font-weight: 500; }
+  .tag-ok { background: #1a3020; color: #6aaa6a; }
+  .tag-warn { background: #3a2800; color: #d08040; }
+  .tag-danger { background: #3a1010; color: #d04040; }
+  .days-badge { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 3px; font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; font-weight: 500; }
+
+  /* ── TABLE ── */
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  th { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+  td { padding: 0.6rem 0.75rem; border-bottom: 1px solid #1f1e1b; vertical-align: middle; }
+  tr:hover td { background: #1f1e1a; }
+  tr:last-child td { border-bottom: none; }
+
+  /* ── MISC ── */
+  .empty { text-align: center; color: var(--muted); font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 2rem; }
+  .si { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; color: var(--muted); }
+  .stat-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 0.9rem; text-align: center; }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--accent2); }
+  .stat-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.2rem; }
+
+  /* ── MODAL ── */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--accent); border-radius: 8px; padding: 1.5rem; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; }
+  .modal h2 { font-family: 'Playfair Display', serif; color: var(--accent2); margin-bottom: 1rem; }
+  .modal-close { float: right; background: none; border: none; color: var(--muted); font-size: 1.3rem; cursor: pointer; }
+  .checkrow { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem; }
+  .checkrow input[type=checkbox] { width: auto; accent-color: var(--accent); }
+  .checkrow label { margin: 0; text-transform: none; font-size: 0.88rem; color: var(--text); letter-spacing: 0; }
+
+  /* ── MOBILE RESPONSIVE ── */
+  @media(max-width: 700px) {
+    #desknav { display: none; }
+    #mobnav { display: block; }
+    .page { padding-bottom: calc(var(--bottom-nav-h) + 1rem); }
+    header h1 { font-size: 1.2rem; }
+    .icon-btn span.lbl { display: none; }
+    /* Hide table columns on small screens */
+    .hide-mob { display: none; }
+    table { font-size: 0.82rem; }
+    td, th { padding: 0.45rem 0.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔨 Járningarskrá</h1>
+  <div class="header-actions">
+    <button class="icon-btn" id="btnExport" title="Vista gögn">💾 <span class="lbl">Vista</span></button>
+    <button class="icon-btn" id="btnImport" title="Sækja gögn">📂 <span class="lbl">Sækja</span></button>
+    <input type="file" id="fileInput" accept=".json" style="display:none">
+  </div>
+</header>
+
+<!-- Desktop nav (top) -->
+<nav id="desknav">
+  <button class="active" data-page="yfirlit">Yfirlit</button>
+  <button data-page="vidskiptavinir">Viðskiptavinir</button>
+  <button data-page="hross">Hross</button>
+  <button data-page="jardningar">Járningar</button>
+</nav>
+
+<!-- Mobile nav (bottom) -->
+<div id="mobnav">
+  <div class="mob-tabs">
+    <button class="active" data-page="yfirlit"><span class="nav-icon">🏠</span>Yfirlit</button>
+    <button data-page="vidskiptavinir"><span class="nav-icon">👤</span>Viðsk.</button>
+    <button data-page="hross"><span class="nav-icon">🐴</span>Hross</button>
+    <button data-page="jardningar"><span class="nav-icon">🔨</span>Járningar</button>
+  </div>
+</div>
+
+<!-- YFIRLIT -->
+<div id="page-yfirlit" class="page active">
+  <div class="grid3" style="margin-bottom:1.25rem">
+    <div class="stat-box"><div class="stat-num" id="stat-vsk">0</div><div class="stat-lbl">Viðskiptavinir</div></div>
+    <div class="stat-box"><div class="stat-num" id="stat-hross">0</div><div class="stat-lbl">Hross</div></div>
+    <div class="stat-box"><div class="stat-num" id="stat-jarn">0</div><div class="stat-lbl">Járningar</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">Þarfnast járningar fljótlega</span></div>
+    <table>
+      <thead><tr><th>Hestur</th><th class="hide-mob">Eigandi</th><th class="hide-mob">Síðast járnað</th><th>Staða</th></tr></thead>
+      <tbody id="tbl-tharf"></tbody>
+    </table>
+    <div class="empty" id="empty-tharf" style="display:none">Enginn hestur þarfnast járningar</div>
+  </div>
+</div>
+
+<!-- VIÐSKIPTAVINIR -->
+<div id="page-vidskiptavinir" class="page">
+  <div class="card-header" style="margin-bottom:1rem">
+    <span class="ph-title">Viðskiptavinir</span>
+    <button class="btn" id="btnAddVsk">+ Bæta við</button>
+  </div>
+  <div id="listVsk"><div class="empty">Engir viðskiptavinir skráðir</div></div>
+</div>
+
+<!-- HROSS -->
+<div id="page-hross" class="page">
+  <div class="card-header" style="margin-bottom:1rem">
+    <span class="ph-title">Hross</span>
+    <button class="btn" id="btnAddHross">+ Bæta við</button>
+  </div>
+  <div id="listHross"><div class="empty">Engin hross skráð</div></div>
+</div>
+
+<!-- JÁRNINGAR -->
+<div id="page-jardningar" class="page">
+  <div class="card-header" style="margin-bottom:1rem">
+    <span class="ph-title">Járningar</span>
+    <button class="btn" id="btnAddJarn">+ Skrá járningu</button>
+  </div>
+  <div class="card" style="overflow-x:auto">
+    <table>
+      <thead><tr><th>Hestur</th><th class="hide-mob">Eigandi</th><th>Dagsetning</th><th class="hide-mob">Framan</th><th class="hide-mob">Aftan</th><th class="hide-mob">Botnar</th><th class="hide-mob">Ath</th><th></th></tr></thead>
+      <tbody id="tblJarn"></tbody>
+    </table>
+    <div class="empty" id="emptyJarn">Engar járningar skráðar</div>
+  </div>
+</div>
+
+<!-- Modal: Viðskiptavinur -->
+<div class="modal-overlay" id="modalVsk">
+  <div class="modal">
+    <button class="modal-close" id="closeVsk">✕</button>
+    <h2 id="titleVsk">Nýr viðskiptavinur</h2>
+    <input type="hidden" id="vskId">
+    <label>Nafn</label><input id="vskNafn" placeholder="Nafn viðskiptavinar">
+    <label>Símanúmer</label><input id="vskSimi" placeholder="Símanúmer" type="tel">
+    <label>Netfang</label><input id="vskNetfang" placeholder="netfang@email.is" type="email">
+    <label>Heimilisfang</label><input id="vskHeimilisfang" placeholder="Heimilisfang">
+    <label>Athugasemd</label><textarea id="vskAth" rows="2"></textarea>
+    <div class="btn-row">
+      <button class="btn" id="saveVskBtn">Vista</button>
+      <button class="btn btn-outline" id="cancelVskBtn">Hætta við</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Hestur -->
+<div class="modal-overlay" id="modalHross">
+  <div class="modal">
+    <button class="modal-close" id="closeHross">✕</button>
+    <h2 id="titleHross">Nýr hestur</h2>
+    <input type="hidden" id="hrossId">
+    <label>Nafn hests</label><input id="hrossNafn" placeholder="Nafn hests">
+    <label>Eigandi</label><select id="hrossEigandi"><option value="">— Veldu eiganda —</option></select>
+    <label>Kyn</label>
+    <select id="hrossKyn"><option value="">—</option><option>Meri</option><option>Geldingur</option><option>Stóðhestur</option></select>
+    <label>Litur</label><input id="hrossLitur" placeholder="t.d. Jarpur">
+    <label>Fæðingarár</label><input id="hrossFaeding" type="number" placeholder="t.d. 2015">
+    <label>Skeifustærð (framan)</label><input id="hrossSkeifaF" placeholder="t.d. 00, 0, 1, 2...">
+    <label>Skeifustærð (aftan)</label><input id="hrossSkeifaA" placeholder="t.d. 00, 0, 1, 2...">
+    <label>Látabil (vikur)</label><input id="hrossLatabil" type="number" value="8">
+    <label>Athugasemd</label><textarea id="hrossAth" rows="2"></textarea>
+    <div class="btn-row">
+      <button class="btn" id="saveHrossBtn">Vista</button>
+      <button class="btn btn-outline" id="cancelHrossBtn">Hætta við</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Járning -->
+<div class="modal-overlay" id="modalJarn">
+  <div class="modal">
+    <button class="modal-close" id="closeJarn">✕</button>
+    <h2 id="titleJarn">Skrá járningu</h2>
+    <input type="hidden" id="jarnId">
+    <label>Hestur</label><select id="jarnHross"><option value="">— Veldu hest —</option></select>
+    <label>Dagsetning</label><input id="jarnDags" type="date">
+    <div class="grid2">
+      <div><label>Skeifur framan</label><input id="jarnSkeifaF" placeholder="t.d. 0, 1, 2..."></div>
+      <div><label>Skeifur aftan</label><input id="jarnSkeifaA" placeholder="t.d. 0, 1, 2..."></div>
+    </div>
+    <div class="checkrow"><input type="checkbox" id="jarnBotnarF"><label for="jarnBotnarF">Botnar framan</label></div>
+    <div class="checkrow"><input type="checkbox" id="jarnBotnarA"><label for="jarnBotnarA">Botnar aftan</label></div>
+    <label>Verð (kr)</label><input id="jarnVerd" type="number" placeholder="0">
+    <label>Athugasemd</label><textarea id="jarnAth" rows="2"></textarea>
+    <div class="btn-row">
+      <button class="btn" id="saveJarnBtn">Vista</button>
+      <button class="btn btn-outline" id="cancelJarnBtn">Hætta við</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var D = JSON.parse(localStorage.getItem('jarningar_v1') || '{"vsk":[],"hross":[],"jarn":[]}');
+function save() { localStorage.setItem('jarningar_v1', JSON.stringify(D)); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
+function v(id) { return document.getElementById(id); }
+function val(id) { return v(id).value; }
+function setVal(id, x) { v(id).value = (x == null ? '' : x); }
+
+// ── NAV (both desktop and mobile) ──────────────────────────────────
+function switchPage(page) {
+  document.querySelectorAll('#desknav button, #mobnav button').forEach(function(b){
+    b.classList.toggle('active', b.dataset.page === page);
+  });
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  v('page-' + page).classList.add('active');
+  render();
+}
+document.querySelectorAll('#desknav button, #mobnav button').forEach(function(btn) {
+  btn.addEventListener('click', function(){ switchPage(btn.dataset.page); });
+});
+
+// ── EXPORT / IMPORT ────────────────────────────────────────────────
+v('btnExport').addEventListener('click', function() {
+  var json = JSON.stringify(D, null, 2);
+  var blob = new Blob([json], {type: 'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  var d = new Date();
+  a.download = 'jarningar_' + d.toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+v('btnImport').addEventListener('click', function() { v('fileInput').click(); });
+v('fileInput').addEventListener('change', function(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      var loaded = JSON.parse(ev.target.result);
+      if (!loaded.vsk || !loaded.hross || !loaded.jarn) throw new Error('Ógilt snið');
+      if (!confirm('Þetta mun skrifa yfir núverandi gögn. Halda áfram?')) return;
+      D = loaded;
+      save();
+      render();
+      alert('Gögn hlaðin inn!');
+    } catch(err) {
+      alert('Villa við lestur skráar: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+// ── MODALS ─────────────────────────────────────────────────────────
+function openM(id) { v(id).classList.add('open'); }
+function closeM(id) { v(id).classList.remove('open'); }
+v('closeVsk').onclick = function(){ closeM('modalVsk'); };
+v('cancelVskBtn').onclick = function(){ closeM('modalVsk'); };
+v('closeHross').onclick = function(){ closeM('modalHross'); };
+v('cancelHrossBtn').onclick = function(){ closeM('modalHross'); };
+v('closeJarn').onclick = function(){ closeM('modalJarn'); };
+v('cancelJarnBtn').onclick = function(){ closeM('modalJarn'); };
+// Close on overlay click
+['modalVsk','modalHross','modalJarn'].forEach(function(id){
+  v(id).addEventListener('click', function(e){ if(e.target === v(id)) closeM(id); });
+});
+
+// ── VIÐSKIPTAVINIR ─────────────────────────────────────────────────
+v('btnAddVsk').onclick = function() {
+  v('titleVsk').textContent = 'Nýr viðskiptavinur';
+  ['vskId','vskNafn','vskSimi','vskNetfang','vskHeimilisfang','vskAth'].forEach(function(id){ setVal(id,''); });
+  openM('modalVsk');
+};
+v('saveVskBtn').onclick = function() {
+  var nafn = val('vskNafn').trim();
+  if (!nafn) { alert('Nafn vantar'); return; }
+  var id = val('vskId') || uid();
+  var obj = { id:id, nafn:nafn, simi:val('vskSimi'), netfang:val('vskNetfang'), heimilisfang:val('vskHeimilisfang'), ath:val('vskAth') };
+  var idx = D.vsk.findIndex(function(x){ return x.id===id; });
+  if (idx>=0) D.vsk[idx]=obj; else D.vsk.push(obj);
+  save(); closeM('modalVsk'); render();
+};
+function editVsk(id) {
+  var x = D.vsk.find(function(a){ return a.id===id; });
+  v('titleVsk').textContent = 'Breyta viðskiptavin';
+  setVal('vskId',x.id); setVal('vskNafn',x.nafn); setVal('vskSimi',x.simi); setVal('vskNetfang',x.netfang); setVal('vskHeimilisfang',x.heimilisfang); setVal('vskAth',x.ath);
+  openM('modalVsk');
+}
+function delVsk(id) {
+  if (!confirm('Eyða viðskiptavin?')) return;
+  D.vsk = D.vsk.filter(function(x){ return x.id!==id; });
+  save(); render();
+}
+
+// ── HROSS ──────────────────────────────────────────────────────────
+function fillVskSel(selId, chosen) {
+  var sel = v(selId);
+  sel.innerHTML = '<option value="">— Veldu eiganda —</option>';
+  D.vsk.forEach(function(x) {
+    var o = document.createElement('option');
+    o.value=x.id; o.textContent=x.nafn;
+    if(x.id===chosen) o.selected=true;
+    sel.appendChild(o);
+  });
+}
+function fillHrossSel(selId, chosen) {
+  var sel = v(selId);
+  sel.innerHTML = '<option value="">— Veldu hest —</option>';
+  D.hross.forEach(function(h) {
+    var eig = D.vsk.find(function(x){ return x.id===h.eigandi; });
+    var o = document.createElement('option');
+    o.value=h.id; o.textContent=h.nafn+(eig?' ('+eig.nafn+')':'');
+    if(h.id===chosen) o.selected=true;
+    sel.appendChild(o);
+  });
+}
+v('btnAddHross').onclick = function() {
+  v('titleHross').textContent = 'Nýr hestur';
+  ['hrossId','hrossNafn','hrossLitur','hrossFaeding','hrossSkeifaF','hrossSkeifaA','hrossAth'].forEach(function(id){ setVal(id,''); });
+  setVal('hrossLatabil',8); setVal('hrossKyn','');
+  fillVskSel('hrossEigandi','');
+  openM('modalHross');
+};
+function editHross(id) {
+  var h = D.hross.find(function(x){ return x.id===id; });
+  v('titleHross').textContent = 'Breyta hesti';
+  setVal('hrossId',h.id); setVal('hrossNafn',h.nafn); setVal('hrossLitur',h.litur); setVal('hrossFaeding',h.faeding);
+  setVal('hrossSkeifaF',h.skeifa_f); setVal('hrossSkeifaA',h.skeifa_a); setVal('hrossLatabil',h.latabil||8); setVal('hrossKyn',h.kyn); setVal('hrossAth',h.ath);
+  fillVskSel('hrossEigandi',h.eigandi);
+  openM('modalHross');
+}
+v('saveHrossBtn').onclick = function() {
+  var nafn = val('hrossNafn').trim();
+  if (!nafn) { alert('Nafn vantar'); return; }
+  var id = val('hrossId') || uid();
+  var obj = { id:id, nafn:nafn, eigandi:val('hrossEigandi'), kyn:val('hrossKyn'), litur:val('hrossLitur'), faeding:val('hrossFaeding'), skeifa_f:val('hrossSkeifaF'), skeifa_a:val('hrossSkeifaA'), latabil:parseInt(val('hrossLatabil'))||8, ath:val('hrossAth') };
+  var idx = D.hross.findIndex(function(x){ return x.id===id; });
+  if (idx>=0) D.hross[idx]=obj; else D.hross.push(obj);
+  save(); closeM('modalHross'); render();
+};
+function delHross(id) {
+  if (!confirm('Eyða hesti?')) return;
+  D.hross = D.hross.filter(function(x){ return x.id!==id; });
+  D.jarn = D.jarn.filter(function(x){ return x.hross!==id; });
+  save(); render();
+}
+
+// ── JÁRNINGAR ──────────────────────────────────────────────────────
+v('btnAddJarn').onclick = function() { openAddJarn(''); };
+v('jarnHross').onchange = function() {
+  var h = D.hross.find(function(x){ return x.id===v('jarnHross').value; });
+  if (h) { setVal('jarnSkeifaF',h.skeifa_f); setVal('jarnSkeifaA',h.skeifa_a); }
+};
+function openAddJarn(hrossId) {
+  v('titleJarn').textContent = 'Skrá járningu';
+  setVal('jarnId',''); setVal('jarnDags', new Date().toISOString().slice(0,10));
+  setVal('jarnAth',''); setVal('jarnVerd','');
+  v('jarnBotnarF').checked=false; v('jarnBotnarA').checked=false;
+  fillHrossSel('jarnHross', hrossId);
+  if (hrossId) {
+    var h = D.hross.find(function(x){ return x.id===hrossId; });
+    if (h) { setVal('jarnSkeifaF',h.skeifa_f); setVal('jarnSkeifaA',h.skeifa_a); }
+  } else { setVal('jarnSkeifaF',''); setVal('jarnSkeifaA',''); }
+  openM('modalJarn');
+}
+function editJarn(id) {
+  var j = D.jarn.find(function(x){ return x.id===id; });
+  v('titleJarn').textContent = 'Breyta járningu';
+  setVal('jarnId',j.id); setVal('jarnDags',j.dags);
+  setVal('jarnSkeifaF',j.skeifa_f); setVal('jarnSkeifaA',j.skeifa_a);
+  v('jarnBotnarF').checked=!!j.botnar_f; v('jarnBotnarA').checked=!!j.botnar_a;
+  setVal('jarnVerd',j.verd); setVal('jarnAth',j.ath);
+  fillHrossSel('jarnHross',j.hross);
+  openM('modalJarn');
+}
+v('saveJarnBtn').onclick = function() {
+  var hrossId=val('jarnHross'), dags=val('jarnDags');
+  if (!hrossId||!dags) { alert('Hestur og dagsetning verða að vera skráð'); return; }
+  var id = val('jarnId') || uid();
+  var obj = { id:id, hross:hrossId, dags:dags, skeifa_f:val('jarnSkeifaF'), skeifa_a:val('jarnSkeifaA'), botnar_f:v('jarnBotnarF').checked, botnar_a:v('jarnBotnarA').checked, verd:val('jarnVerd'), ath:val('jarnAth') };
+  var idx = D.jarn.findIndex(function(x){ return x.id===id; });
+  if (idx>=0) D.jarn[idx]=obj; else D.jarn.push(obj);
+  save(); closeM('modalJarn'); render();
+};
+function delJarn(id) {
+  if (!confirm('Eyða járningu?')) return;
+  D.jarn = D.jarn.filter(function(x){ return x.id!==id; });
+  save(); render();
+}
+
+// ── HELPERS ────────────────────────────────────────────────────────
+function daysSince(ds) { return Math.floor((Date.now()-new Date(ds))/86400000); }
+function badge(days, lat) {
+  var max=(lat||8)*7;
+  var cls = days<max*0.7?'tag-ok': days<max?'tag-warn':'tag-danger';
+  return '<span class="days-badge '+cls+'">'+days+' dagar</span>';
+}
+function lastJ(hid) {
+  return D.jarn.filter(function(x){ return x.hross===hid; }).sort(function(a,b){ return b.dags.localeCompare(a.dags); })[0]||null;
+}
+
+// ── RENDER ─────────────────────────────────────────────────────────
+function render() {
+  v('stat-vsk').textContent=D.vsk.length;
+  v('stat-hross').textContent=D.hross.length;
+  v('stat-jarn').textContent=D.jarn.length;
+
+  // Yfirlit
+  var tt=v('tbl-tharf'), et=v('empty-tharf');
+  var need=D.hross.map(function(h){ var j=lastJ(h.id),days=j?daysSince(j.dags):null; return {h:h,j:j,days:days}; })
+    .filter(function(x){ return x.days===null||x.days>=(x.h.latabil||8)*7*0.7; })
+    .sort(function(a,b){ return (b.days||9999)-(a.days||9999); });
+  tt.innerHTML=''; et.style.display=need.length===0?'block':'none';
+  need.forEach(function(x) {
+    var eig=D.vsk.find(function(v){ return v.id===x.h.eigandi; });
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td>🐴 '+x.h.nafn+'</td><td class="hide-mob">'+(eig?eig.nafn:'—')+'</td><td class="hide-mob">'+(x.j?x.j.dags:'Aldrei')+'</td><td>'+(x.days===null?'<span class="tag tag-danger">Aldrei</span>':badge(x.days,x.h.latabil))+' <button class="btn btn-sm" onclick="openAddJarn(\''+x.h.id+'\')">Járna</button></td>';
+    tt.appendChild(tr);
+  });
+
+  // Viðskiptavinir
+  var lv=v('listVsk');
+  if (!D.vsk.length) { lv.innerHTML='<div class="empty">Engir viðskiptavinir skráðir</div>'; }
+  else {
+    lv.innerHTML=D.vsk.map(function(x) {
+      var hross=D.hross.filter(function(h){ return h.eigandi===x.id; });
+      var hhtml=!hross.length?'<div style="color:var(--muted);font-size:.82rem">Engin hross skráð</div>'
+        :hross.map(function(h){
+          var j=lastJ(h.id),days=j?daysSince(j.dags):null;
+          return '<div style="display:flex;align-items:center;gap:.6rem;padding:.4rem 0;border-bottom:1px solid var(--border);flex-wrap:wrap">🐴 '+h.nafn+' '+(days===null?'<span class="tag tag-danger">Aldrei járnað</span>':badge(days,h.latabil))+' <button class="btn btn-sm btn-outline" onclick="openAddJarn(\''+h.id+'\')">Járna</button></div>';
+        }).join('');
+      return '<div class="card"><div class="card-header"><span class="card-title">'+x.nafn+'</span><div><button class="ab" onclick="editVsk(\''+x.id+'\')">✏️</button> <button class="ab del" onclick="delVsk(\''+x.id+'\')">🗑️</button></div></div>'
+        +'<div style="font-size:.85rem;color:var(--muted);margin-bottom:.75rem">'+(x.simi?'📞 '+x.simi+'&nbsp;&nbsp;':'')+(x.netfang?'✉️ '+x.netfang:'')+(x.heimilisfang?'<br>📍 '+x.heimilisfang:'')+'</div>'
+        +'<div style="font-size:.82rem;font-family:IBM Plex Mono,monospace;color:var(--muted);margin-bottom:.5rem">HROSS ('+hross.length+')</div>'+hhtml
+        +(x.ath?'<div style="font-size:.82rem;color:var(--muted);margin-top:.75rem">💬 '+x.ath+'</div>':'')+'</div>';
+    }).join('');
+  }
+
+  // Hross
+  var lh=v('listHross');
+  if (!D.hross.length) { lh.innerHTML='<div class="empty">Engin hross skráð</div>'; }
+  else {
+    lh.innerHTML=D.hross.map(function(h) {
+      var eig=D.vsk.find(function(x){ return x.id===h.eigandi; });
+      var j=lastJ(h.id),days=j?daysSince(j.dags):null;
+      var jarns=D.jarn.filter(function(x){ return x.hross===h.id; }).sort(function(a,b){ return b.dags.localeCompare(a.dags); });
+      var saga=!jarns.length?''
+        :'<div style="margin-top:1rem;overflow-x:auto"><div style="font-size:.75rem;font-family:IBM Plex Mono,monospace;color:var(--muted);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.05em">Járningasaga</div>'
+        +'<table><thead><tr><th>Dags</th><th>Framan</th><th>Aftan</th><th>Botnar</th><th class="hide-mob">Verð</th><th class="hide-mob">Ath</th><th></th></tr></thead><tbody>'
+        +jarns.map(function(jj){
+          var bot=(jj.botnar_f?'F ':''+(jj.botnar_a?'A':''))||'—';
+          return '<tr><td>'+jj.dags+'</td><td>'+(jj.skeifa_f||'—')+'</td><td>'+(jj.skeifa_a||'—')+'</td><td>'+bot+'</td><td class="hide-mob">'+(jj.verd?jj.verd+' kr':'—')+'</td><td class="hide-mob">'+(jj.ath||'')+'</td><td style="white-space:nowrap"><button class="ab" onclick="editJarn(\''+jj.id+'\')">✏️</button> <button class="ab del" onclick="delJarn(\''+jj.id+'\')">🗑️</button></td></tr>';
+        }).join('')+'</tbody></table></div>';
+      return '<div class="card">'
+        +'<div class="card-header"><span class="card-title">🐴 '+h.nafn+'</span>'
+        +'<div><button class="btn btn-sm btn-outline" onclick="openAddJarn(\''+h.id+'\')">+ Járna</button> <button class="ab" onclick="editHross(\''+h.id+'\')">✏️</button> <button class="ab del" onclick="delHross(\''+h.id+'\')">🗑️</button></div></div>'
+        +'<div class="grid2"><div><div style="font-size:.8rem;color:var(--muted);margin-bottom:.2rem">Eigandi</div><div>'+(eig?eig.nafn:'—')+'</div></div>'
+        +'<div><div style="font-size:.8rem;color:var(--muted);margin-bottom:.2rem">Síðast járnað</div><div>'+(j?j.dags+' — '+badge(days,h.latabil):'<span class="tag tag-danger">Aldrei</span>')+'</div></div></div>'
+        +'<div style="margin-top:.75rem;display:flex;gap:1.2rem;flex-wrap:wrap">'
+        +'<div><span class="si">SKEIFUR FRAMAN:</span> <strong>'+(h.skeifa_f||'—')+'</strong></div>'
+        +'<div><span class="si">SKEIFUR AFTAN:</span> <strong>'+(h.skeifa_a||'—')+'</strong></div>'
+        +'<div><span class="si">LÁTABIL:</span> <strong>'+(h.latabil||8)+' vikur</strong></div>'
+        +(h.kyn?'<div><span class="si">KYN:</span> <strong>'+h.kyn+'</strong></div>':'')
+        +(h.litur?'<div><span class="si">LITUR:</span> <strong>'+h.litur+'</strong></div>':'')
+        +(h.faeding?'<div><span class="si">FÆTT:</span> <strong>'+h.faeding+'</strong></div>':'')+'</div>'
+        +(h.ath?'<div style="font-size:.82rem;color:var(--muted);margin-top:.5rem">💬 '+h.ath+'</div>':'')
+        +saga+'</div>';
+    }).join('');
+  }
+
+  // Járningar
+  var tj=v('tblJarn'),ej=v('emptyJarn');
+  var sorted=D.jarn.slice().sort(function(a,b){ return b.dags.localeCompare(a.dags); });
+  tj.innerHTML=''; ej.style.display=!sorted.length?'block':'none';
+  sorted.forEach(function(j) {
+    var h=D.hross.find(function(x){ return x.id===j.hross; });
+    var eig=h?D.vsk.find(function(x){ return x.id===h.eigandi; }):null;
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td>🐴 '+(h?h.nafn:'?')+'</td><td class="hide-mob">'+(eig?eig.nafn:'—')+'</td><td>'+j.dags+'</td><td class="hide-mob">'+(j.skeifa_f||'—')+'</td><td class="hide-mob">'+(j.skeifa_a||'—')+'</td><td class="hide-mob">'+(j.botnar_f?'✓ F ':'')+( j.botnar_a?'✓ A':'')+'</td><td class="hide-mob">'+(j.ath||'')+'</td><td style="white-space:nowrap"><button class="ab" onclick="editJarn(\''+j.id+'\')">✏️</button> <button class="ab del" onclick="delJarn(\''+j.id+'\')">🗑️</button></td>';
+    tj.appendChild(tr);
+  });
+}
+
+render();
+</script>
+</body>
+</html>

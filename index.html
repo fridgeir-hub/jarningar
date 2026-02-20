@@ -449,6 +449,11 @@ function delJarn(id) {
 }
 
 // ── HELPERS ────────────────────────────────────────────────────────
+function fmtDate(ds) {
+  if (!ds) return '';
+  var p = ds.split('-');
+  return p[2]+'/'+p[1]+'/'+p[0];
+}
 function daysSince(ds) { return Math.floor((Date.now()-new Date(ds))/86400000); }
 function badge(days, lat) {
   var max=(lat||8)*7;
@@ -474,7 +479,7 @@ function render() {
   need.forEach(function(x) {
     var eig=D.vsk.find(function(v){ return v.id===x.h.eigandi; });
     var tr=document.createElement('tr');
-    tr.innerHTML='<td>🐴 '+x.h.nafn+'</td><td class="hide-mob">'+(eig?eig.nafn:'—')+'</td><td class="hide-mob">'+(x.j?x.j.dags:'Aldrei')+'</td><td>'+(x.days===null?'<span class="tag tag-danger">Aldrei</span>':badge(x.days,x.h.latabil))+' <button class="btn btn-sm" onclick="openAddJarn(\''+x.h.id+'\')">Járna</button></td>';
+    tr.innerHTML='<td>🐴 '+x.h.nafn+'</td><td class="hide-mob">'+(eig?eig.nafn:'—')+'</td><td class="hide-mob">'+(x.j?fmtDate(x.j.dags):'Aldrei')+'</td><td>'+(x.days===null?'<span class="tag tag-danger">Aldrei</span>':badge(x.days,x.h.latabil))+' <button class="btn btn-sm" onclick="openAddJarn(\''+x.h.id+'\')">Járna</button></td>';
     tt.appendChild(tr);
   });
 
@@ -509,13 +514,13 @@ function render() {
         +'<table><thead><tr><th>Dags</th><th>Framan</th><th>Aftan</th><th>Botnar</th><th class="hide-mob">Verð</th><th class="hide-mob">Ath</th><th></th></tr></thead><tbody>'
         +jarns.map(function(jj){
           var bot=(jj.botnar_f?'F ':''+(jj.botnar_a?'A':''))||'—';
-          return '<tr><td>'+jj.dags+'</td><td>'+(jj.skeifa_f||'—')+'</td><td>'+(jj.skeifa_a||'—')+'</td><td>'+bot+'</td><td class="hide-mob">'+(jj.verd?jj.verd+' kr':'—')+'</td><td class="hide-mob">'+(jj.ath||'')+'</td><td style="white-space:nowrap"><button class="ab" onclick="editJarn(\''+jj.id+'\')">✏️</button> <button class="ab del" onclick="delJarn(\''+jj.id+'\')">🗑️</button></td></tr>';
+          return '<tr><td>'+fmtDate(jj.dags)+'</td><td>'+(jj.skeifa_f||'—')+'</td><td>'+(jj.skeifa_a||'—')+'</td><td>'+bot+'</td><td class="hide-mob">'+(jj.verd?jj.verd+' kr':'—')+'</td><td class="hide-mob">'+(jj.ath||'')+'</td><td style="white-space:nowrap"><button class="ab" onclick="editJarn(\''+jj.id+'\')">✏️</button> <button class="ab del" onclick="delJarn(\''+jj.id+'\')">🗑️</button></td></tr>';
         }).join('')+'</tbody></table></div>';
       return '<div class="card">'
         +'<div class="card-header"><span class="card-title">🐴 '+h.nafn+'</span>'
         +'<div><button class="btn btn-sm btn-outline" onclick="openAddJarn(\''+h.id+'\')">+ Járna</button> <button class="ab" onclick="editHross(\''+h.id+'\')">✏️</button> <button class="ab del" onclick="delHross(\''+h.id+'\')">🗑️</button></div></div>'
         +'<div class="grid2"><div><div style="font-size:.8rem;color:var(--muted);margin-bottom:.2rem">Eigandi</div><div>'+(eig?eig.nafn:'—')+'</div></div>'
-        +'<div><div style="font-size:.8rem;color:var(--muted);margin-bottom:.2rem">Síðast járnað</div><div>'+(j?j.dags+' — '+badge(days,h.latabil):'<span class="tag tag-danger">Aldrei</span>')+'</div></div></div>'
+        +'<div><div style="font-size:.8rem;color:var(--muted);margin-bottom:.2rem">Síðast járnað</div><div>'+(j?fmtDate(j.dags)+' — '+badge(days,h.latabil):'<span class="tag tag-danger">Aldrei</span>')+'</div></div></div>'
         +'<div style="margin-top:.75rem;display:flex;gap:1.2rem;flex-wrap:wrap">'
         +'<div><span class="si">SKEIFUR FRAMAN:</span> <strong>'+(h.skeifa_f||'—')+'</strong></div>'
         +'<div><span class="si">SKEIFUR AFTAN:</span> <strong>'+(h.skeifa_a||'—')+'</strong></div>'
@@ -536,7 +541,7 @@ function render() {
     var h=D.hross.find(function(x){ return x.id===j.hross; });
     var eig=h?D.vsk.find(function(x){ return x.id===h.eigandi; }):null;
     var tr=document.createElement('tr');
-    tr.innerHTML='<td>🐴 '+(h?h.nafn:'?')+'</td><td class="hide-mob">'+(eig?eig.nafn:'—')+'</td><td>'+j.dags+'</td><td class="hide-mob">'+(j.skeifa_f||'—')+'</td><td class="hide-mob">'+(j.skeifa_a||'—')+'</td><td class="hide-mob">'+(j.botnar_f?'✓ F ':'')+( j.botnar_a?'✓ A':'')+'</td><td class="hide-mob">'+(j.ath||'')+'</td><td style="white-space:nowrap"><button class="ab" onclick="editJarn(\''+j.id+'\')">✏️</button> <button class="ab del" onclick="delJarn(\''+j.id+'\')">🗑️</button></td>';
+    tr.innerHTML='<td>🐴 '+(h?h.nafn:'?')+'</td><td class="hide-mob">'+(eig?eig.nafn:'—')+'</td><td>'+fmtDate(j.dags)+'</td><td class="hide-mob">'+(j.skeifa_f||'—')+'</td><td class="hide-mob">'+(j.skeifa_a||'—')+'</td><td class="hide-mob">'+(j.botnar_f?'✓ F ':'')+( j.botnar_a?'✓ A':'')+'</td><td class="hide-mob">'+(j.ath||'')+'</td><td style="white-space:nowrap"><button class="ab" onclick="editJarn(\''+j.id+'\')">✏️</button> <button class="ab del" onclick="delJarn(\''+j.id+'\')">🗑️</button></td>';
     tj.appendChild(tr);
   });
 }
